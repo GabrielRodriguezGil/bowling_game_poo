@@ -15,7 +15,7 @@ class ScoreCard:
             if self.frame_number == Scoring.TEN.value:
                 self.frames[self.frame_number] = score_card[position:]
                 self.frame_number += 1
-            elif score_card[position] != Scoring.SRIKE.value:
+            elif score_card[position] != Scoring.STRIKE.value:
                 self.frames[self.frame_number] = score_card[position : position + 2]
                 position += 2
                 self.frame_number += 1

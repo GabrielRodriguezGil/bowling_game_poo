@@ -13,6 +13,6 @@ class Scoring(Enum):
     EIGHT = 8
     NINE = 9
     TEN = 10
-    SRIKE = "X"
+    STRIKE = "X"
     SPARE = "/"
     FOUL = "-"
