@@ -24,3 +24,20 @@ class ScoreCard:
                 position += 1
                 self.frame_number += 1
         return self.frames
+
+    def score_points(self, frames):
+        assert isinstance(frames, dict)
+        self.score = 0
+        frames_values = frames.values()
+        last_roll = None
+        for frame in frames_values:
+            if "X" in frame:
+                self.score += 10
+                last_roll = "X"
+            elif "/" in frame:
+                if last_roll == "X" or "/":
+                    self.score += int(frame[0]) + 10
+                last_roll = "/"
+            else:
+                self.score += int(frame[0]) + int(frame[1])
+        return self.score
