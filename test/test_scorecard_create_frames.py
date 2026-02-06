@@ -9,7 +9,9 @@ STRIKE_FRAME_LENGHT = 1
 
 @pytest.mark.all_numbers
 def test_all_pins_number():
-    assert len(ScoreCard("12345123451234512345").create_frames()) == FRAMES_LENGHT
+    frame = ScoreCard("12345123451234512345").create_frames()
+    assert len(frame) == FRAMES_LENGHT
+    assert ScoreCard("12345123451234512345").score_points(frame) == 60
 
 
 @pytest.mark.all_numbers
