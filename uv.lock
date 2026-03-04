@@ -8,6 +8,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "pytest" },
+    { name = "pytest-cov" },
     { name = "pytest-coverage" },
     { name = "pytest-sugar" },
 ]
@@ -15,6 +16,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "pytest", specifier = ">=9.0.2" },
+    { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "pytest-coverage", specifier = ">=0.0" },
     { name = "pytest-sugar", specifier = ">=1.1.1" },
 ]
