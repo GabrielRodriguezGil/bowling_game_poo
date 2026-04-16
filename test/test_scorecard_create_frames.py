@@ -1,97 +1,119 @@
 import pytest
-
 from src.score_card import ScoreCard
 
-FRAMES_LENGHT = 10
-LAST_FRAME_LENGHT_STRIKE = 3
-STRIKE_FRAME_LENGHT = 1
+# Comprobar el correcto funcionamiento de que devuelve la puntuación correcta
 
 
-@pytest.mark.all_numbers
-def test_all_pins_number():
-    frame = ScoreCard("12345123451234512345").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert ScoreCard("12345123451234512345").score_points(frame) == 60
+@pytest.mark.state_n
+def test_hitting_pins_regular():
+    # Hitting pins total = 60
+    pins = "12345123451234512345"
+    total = 60
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
 
-@pytest.mark.all_numbers
-def test_last_strike():
-    frame = ScoreCard("123451234512345123X45").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert len(frame[10]) == LAST_FRAME_LENGHT_STRIKE
-    assert ScoreCard("123451234512345123X45").score_points(frame) == 61
+@pytest.mark.state_n
+def test_symbol_zero():
+    # test symbol -
+    pins = "9-9-9-9-9-9-9-9-9-9-"
+    total = 90
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
-    frame = ScoreCard("9-9-9-9-9-9-9-9-9-XXX").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert len(frame[10]) == LAST_FRAME_LENGHT_STRIKE
-    assert ScoreCard("9-9-9-9-9-9-9-9-9-XXX").score_points(frame) == 111
-
-    frame = ScoreCard("8/549-XX5/53639/9/X").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert len(frame[10]) == LAST_FRAME_LENGHT_STRIKE
-    assert ScoreCard("8/549-XX5/53639/9/X").score_points(frame) == 149
+    pins = "9-3561368153258-7181"
+    total = 82
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
 
-@pytest.mark.all_numbers
-def test_not_last_strike():
-    frame = ScoreCard("X9-9-9-9-9-9-9-9-9-").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert len(frame[1]) == STRIKE_FRAME_LENGHT
-    assert ScoreCard("X9-9-9-9-9-9-9-9-9-").score_points(frame) == 100
-
-    frame = ScoreCard("XX9-9-9-9-9-9-9-9-").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert len(frame[1]) == STRIKE_FRAME_LENGHT
-    assert len(frame[2]) == STRIKE_FRAME_LENGHT
-    assert ScoreCard("XX9-9-9-9-9-9-9-9-").score_points(frame) == 120
-
-    frame = ScoreCard("XXX9-9-9-9-9-9-9-").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert len(frame[1]) == STRIKE_FRAME_LENGHT
-    assert len(frame[2]) == STRIKE_FRAME_LENGHT
-    assert len(frame[3]) == STRIKE_FRAME_LENGHT
-    assert ScoreCard("XXX9-9-9-9-9-9-9-").score_points(frame) == 141
+@pytest.mark.spare
+def test_spare_not_extra():
+    # test spare not extra
+    pins = "9-3/613/815/-/8-7/8-"
+    total = 121
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
 
-@pytest.mark.all_numbers
-def test_fouls():
-    frame = ScoreCard("9-9-9-9-9-9-9-9-9-9-").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert frame == {
-        1: "90",
-        2: "90",
-        3: "90",
-        4: "90",
-        5: "90",
-        6: "90",
-        7: "90",
-        8: "90",
-        9: "90",
-        10: "90",
-    }
-    assert ScoreCard("9-9-9-9-9-9-9-9-9-9-").score_points(frame) == 90
+@pytest.mark.strike
+def test_strike():
+    # test strike
+    pins = "X9-9-9-9-9-9-9-9-9-"
+    total = 100
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
-    frame = ScoreCard("9-3561368153258-7181").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert ScoreCard("9-3561368153258-7181").score_points(frame) == 82
+    pins = "X9-X9-9-9-9-9-9-9-"
+    total = 110
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
 
-@pytest.mark.all_numbers
-def test_spare_not_extra_roll():
-    frame = ScoreCard("9-3/613/815/-/8-7/8-").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert ScoreCard("9-3/613/815/-/8-7/8-").score_points(frame) == 121
+@pytest.mark.strike
+def test_two_strikes():
+    # two strikes in a row is a double
+    pins = "XX9-9-9-9-9-9-9-9-"
+    total = 120
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
 
-@pytest.mark.all_numbers
+@pytest.mark.strike
+def test_three_strikes():
+    # three strikes in a row is a triple
+    pins = "XXX9-9-9-9-9-9-9-"
+    total = 141
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
+
+
+@pytest.mark.extra_rolls
+def test_one_pin_in_extra_roll():
+    # one pin in extra roll
+    pins = "9-3/613/815/-/8-7/8/8"
+    total = 131
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
+
+    pins = "5/5/5/5/5/5/5/5/5/5/5"
+    total = 150
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
+
+
+@pytest.mark.extra_rolls
+def test_two_strikes_in_extra_rolls():
+    # two strikes in extra rolls
+    pins = "9-9-9-9-9-9-9-9-9-XXX"
+    total = 111
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
+
+
+@pytest.mark.extra_rolls
+def test_one_strike_in_extra_roll():
+    # one strike in extra roll
+    pins = "8/549-XX5/53639/9/X"
+    total = 149
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
+
+
+@pytest.mark.extra_rolls
 def test_spare_in_extra_roll():
-    frame = ScoreCard("X5/X5/XX5/--5/X5/").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert ScoreCard("X5/X5/XX5/--5/X5/").score_points(frame) == 175
+    # spare in extra roll
+    pins = "X5/X5/XX5/--5/X5/"
+    total = 175
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
 
 
-@pytest.mark.all_numbers
-def test_all_strikes():
-    frame = ScoreCard("XXXXXXXXXXXX").create_frames()
-    assert len(frame) == FRAMES_LENGHT
-    assert ScoreCard("XXXXXXXXXXXX").score_points(frame) == 300
+@pytest.mark.extra_rolls
+def test_triple_strike_before_extra_rolls():
+    # 12 strikes is a “Thanksgiving Turkey”
+    # 2 strikes in extra rolls
+    pins = "XXXXXXXXXXXX"
+    total = 300
+    score_card = ScoreCard(pins)
+    assert score_card.calculate_points() == total
