@@ -1,43 +1,36 @@
-from src.scoring import Scoring
-
-
 class ScoreCard:
     def __init__(self, score_card):
-        self.score_card = score_card
+        self.score_card = list(score_card.replace("-", "0"))
         self.score = 0
-        self.frame_number = 1
-        self.frames = {}
+        self.last_roll = None
+        self.strike = "X"
+        self.spare = "/"
 
-    def create_frames(self):
-        score_card = self.score_card
-        position = 0
-        while self.frame_number <= Scoring.TEN.value:
-            if self.frame_number == Scoring.TEN.value:
-                self.frames[self.frame_number] = score_card[position:]
-                self.frame_number += 1
-            elif score_card[position] != Scoring.STRIKE.value:
-                self.frames[self.frame_number] = score_card[position : position + 2]
-                position += 2
-                self.frame_number += 1
-            else:
-                self.frames[self.frame_number] = score_card[position : position + 1]
-                position += 1
-                self.frame_number += 1
-        return self.frames
-
-    def score_points(self, frames):
-        assert isinstance(frames, dict)
+    def calculate_points(self):
         self.score = 0
-        frames_values = frames.values()
-        last_roll = None
-        for frame in frames_values:
-            if "X" in frame:
-                self.score += 10
-                last_roll = "X"
-            elif "/" in frame:
-                if last_roll == "X" or "/":
-                    self.score += int(frame[0]) + 10
-                last_roll = "/"
+        rolls = []
+        frames = self.score_card
+        for roll in frames:
+            if roll == self.strike:
+                rolls.append(10)
+            elif roll == self.spare:
+                rolls.append(10 - rolls[-1])
             else:
-                self.score += int(frame[0]) + int(frame[1])
+                rolls.append(int(roll))
+
+        roll_index = 0
+
+        for frame in range(10):
+            if rolls[roll_index] == 10:
+                self.score += 10 + rolls[roll_index + 1] + rolls[roll_index + 2]
+                roll_index += 1
+
+            elif rolls[roll_index] + rolls[roll_index + 1] == 10:
+                self.score += 10 + rolls[roll_index + 2]
+                roll_index += 2
+
+            else:
+                self.score += rolls[roll_index] + rolls[roll_index + 1]
+                roll_index += 2
+
         return self.score
